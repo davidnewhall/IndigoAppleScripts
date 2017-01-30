@@ -14,3 +14,9 @@ for my doorbell and to tell me when my dehumidifer needs its bucket emptied.
 #### Restart_Messages.applescript
 I've run into issues where Messages.app becomes unresponsive because of an
 error window. I created a schedule in Indigo to run this script every minute.
+
+#### FaceTimeCall.applescript
+Legacy script I no longer use/maintain to initiate a FaceTime call.
+
+#### AnswerFaceTime.applescript
+Legacy script I no longer use/maintain to answer an incoming FaceTime call.
