@@ -1,9 +1,9 @@
-# To use this script, create two variables and an Action Group in indigo.
-# The two variables are "SendCamPicture" and "Subscribers".
-# The action group should simply run this script.
-# To use it, set the two variables and run the script/action group.
-# I use this to send a camera pictures based on a z-wave motion detector.
-# Or when someone presses my doorbell. ;)
+--- To use this script, create two variables and an Action Group in indigo.
+--- The two variables are "SendCamPicture" and "Subscribers".
+--- The action group should simply run this script.
+--- To use it, set the two variables and run the script/action group.
+--- I use this to send a camera pictures based on a z-wave motion detector.
+--- Or when someone presses my doorbell. ;)
 
 set tempFile to "/tmp/securityspy_imessage.jpg"
 
