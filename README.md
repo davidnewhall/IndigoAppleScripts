@@ -14,6 +14,12 @@ for my doorbell and to tell me when my dehumidifer needs its bucket emptied.
 #### Restart_Messages.applescript
 I've run into issues where Messages.app becomes unresponsive because of an
 error window. I created a schedule in Indigo to run this script every minute.
+EDIT: I modified the script so you may run it as a standalone application.
+It will continue to work as-is in Indigo, or you can export it from Script
+Editor as an application with the "stay open after run handler" option
+selected. Once you run it, it will make sure Messages.app it always open and
+error-window free. This is a great option for those of you running
+SecuritySpy and iMessageSpy without Indigo.
 
 #### FaceTimeCall.applescript
 Legacy script I no longer use/maintain to initiate a FaceTime call.
