@@ -1,40 +1,53 @@
---- To use this script, create two variables and an Action Group in indigo.
+--- To use this script, create two variables and a Trigger in Indigo.
 --- The two variables are "SendCamPicture" and "Subscribers".
---- The action group should simply run this script.
---- To use it, set the two variables and run the script/action group.
+--- Format of Indigo Variable Subscribers is "user1 user2" (ie. "user@email.com +12099113203")
+--- The Trigger should simply run this script when SendCamPictures changes.
+--- To use it, change the variable SendCamPicture to the number of a camera in SecuritySpy.
 --- I use this to send a camera pictures based on a z-wave motion detector.
 --- Or when someone presses my doorbell. ;)
 
-set tempFile to "/tmp/securityspy_imessage.jpg"
+--- Set this to true if you wish for sent messages to be logged in the Indigo Log.
+property LogMessages : true
+-- This folder is used to save a temporary Image file. 
+property TempFolder : "/tmp"
 
 tell application "IndigoServer"
-	set astid to AppleScript's text item delimiters
-	set Subscribers to value of variable "Subscribers"
-	-- Format of Indigo Variable Subscribers is "user1 user2", space separated recipients (ie. "user@email.com +12099113203")
-	set AppleScript's text item delimiters to space
-	set Subscribers to Subscribers's text items
-	set AppleScript's text item delimiters to astid
-	set camNum to value of variable "SendCamPicture"
 	-- set Indigo Variable SendCamPicture to the SecuritySpy camera #.
+	set camNum to value of variable "SendCamPicture"
+	set Subscribers to value of variable "Subscribers"
+	set AppleScript's text item delimiters to space
+	-- This creates a list, which we iterate over next.
+	set Subscribers to text items of Subscribers
+	set AppleScript's text item delimiters to ""
 end tell
 
-tell application "SecuritySpy"
-	-- If you leave SecuritySpy closed, then uncomment the following lines.
-	--	launch
-	--	delay 1
-	capture image camera number camNum as theFile with overwrite
-end tell
+try
+	tell application "Messages"
+		set ImageFile to ""
+		repeat with Subscriber in Subscribers
+			-- We only capture an image if we have Subscribers.
+			if ImageFile is "" then set ImageFile to my GetImage(camNum)
+			send ImageFile to buddy Subscriber of (1st service whose service type = iMessage)
+			my LogIt("Sent " & Subscriber & " -> A picture of camera #" & camNum)
+			-- You can adjust this delay.  0.5 is long, but it's more reliable.
+			if (count of Subscribers) is greater than 1 then delay 0.2
+		end repeat
+		-- If you use an applescript handler in Message.app, then you need this next line.
+		close windows
+	end tell
+on error
+	my LogIt("Error interacting with Messages.app.")
+end try
 
--- This makes the variable work with Messages.app
-set theFile to (POSIX file theFile)
+on GetImage(camNum)
+	set tempFile to TempFolder & "/securityspy_imessage.jpg"
+	tell application "SecuritySpy"
+		capture image camera number camNum as tempFile with overwrite
+	end tell
+	return (POSIX file tempFile)
+end GetImage
 
-tell application "Messages"
-	repeat with Subscriber in Subscribers
-		set targetBuddy to buddy Subscriber of (1st service whose service type = iMessage)
-		-- You can adjust this delay.  0.5 is long, but it's more reliable.
-		delay 0.2
-		send theFile to targetBuddy
-	end repeat
-	-- If you use an applescript handler in Message.app, then you need this next line.
-	close windows
-end tell
+on LogIt(Msg)
+	if LogMessages is not true then return
+	tell application "IndigoServer" to log Msg
+end LogIt
