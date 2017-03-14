@@ -18,16 +18,32 @@ on CheckMessages()
 			delay 0.5
 			tell application "Messages" to close windows
 		else if (button "Wait" of window 1 of process "Messages" exists) or (button "Ignore Error" of window 1 of process "Messages" exists) then
-			set theID to (unix id of processes whose name is "Messages")
-			do shell script "kill -9 " & theID
-			my LogIt("Killed Messages.app. It had an error window!")
-			delay 4
-			activate application "Messages"
-			delay 0.5
-			tell application "Messages" to close windows
+			RestartApp("Messages", "It had an error window.")
+		else
+			try
+				-- Check if it's stuck. This is rare, but happens.
+				with timeout of 5 seconds
+					activate application "Messages"
+					tell application "Messages" to close windows
+				end timeout
+			on error
+				RestartApp("Messages", "It was stuck.")
+			end try
 		end if
 	end tell
 end CheckMessages
+
+on RestartApp(theApp, Msg)
+	tell application "System Events"
+		set theID to (unix id of processes whose name is theApp)
+	end tell
+	do shell script "kill -9 " & theID
+	delay 4
+	activate application "Messages"
+	my LogIt("Killed and restarted " & theApp & ". " & Msg)
+	delay 0.5
+	tell application "Messages" to close windows
+end RestartApp
 
 on LogIt(Msg)
 	if LogMessages is not true then return
