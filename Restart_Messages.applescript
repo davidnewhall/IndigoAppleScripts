@@ -18,16 +18,15 @@ on CheckMessages()
 			delay 0.5
 			tell application "Messages" to close windows
 		else if (button "Wait" of window 1 of process "Messages" exists) or (button "Ignore Error" of window 1 of process "Messages" exists) then
-			RestartApp("Messages", "It had an error window.")
+			my RestartApp("Messages", "It had an error window.")
 		else
 			try
 				-- Check if it's stuck. This is rare, but happens.
 				with timeout of 5 seconds
-					activate application "Messages"
-					tell application "Messages" to close windows
+					tell application "Messages" to (count windows)
 				end timeout
 			on error
-				RestartApp("Messages", "It was stuck.")
+				my RestartApp("Messages", "It was stuck.")
 			end try
 		end if
 	end tell
